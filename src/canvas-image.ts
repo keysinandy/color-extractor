@@ -1,4 +1,4 @@
-import { ClipOptions } from 'types';
+import { ClipOptions } from './types';
 
 class CanvasImage {
   canvas: HTMLCanvasElement;

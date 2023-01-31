@@ -1,4 +1,4 @@
-import { Rgb } from 'types';
+import { Rgb } from './types';
 
 export const rgbToHsl = (rgb: Rgb) => {
   let { r, g, b } = rgb;

@@ -1,6 +1,6 @@
-import CanvasImage from 'canvas-image';
-import Palette from 'palette';
-import { ExtractorOptions } from 'types';
+import CanvasImage from './canvas-image';
+import Palette from './palette';
+import { ExtractorOptions } from './types';
 
 export const getColor = (image: HTMLImageElement, options: ExtractorOptions = {}) => {
   const { clip, palette } = options;

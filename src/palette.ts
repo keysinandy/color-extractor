@@ -1,4 +1,4 @@
-import { PaletteConfig, Rgb } from 'types';
+import { PaletteConfig, Rgb } from './types';
 
 type ColorArray = Array<[number, number, number]>;
 
