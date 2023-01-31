@@ -1,0 +1,1 @@
+"use strict";var r=function(r){var a=r.r,e=r.g,t=r.b;a/=255,e/=255,t/=255;var s,c,i=Math.max(a,e,t),n=Math.min(a,e,t),u=(i+n)/2;if(i===n)s=c=0;else{var b=i-n;switch(c=u>.5?b/(2-i-n):b/(i+n),i){case a:s=(e-t)/b+(e<t?6:0);break;case e:s=(t-a)/b+2;break;case t:s=(a-e)/b+4;break;default:s=0}s/=6}return[s,c,u]};exports.isDark=function(a){return r(a)[2]<.5},exports.rgbToHsl=r;
