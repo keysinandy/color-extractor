@@ -20,3 +20,12 @@ export interface PaletteConfig {
   background?: Rgb;
   allowWhite?: boolean;
 }
+
+export type GetPlateParamsFn = (
+  image: HTMLImageElement,
+  options: ExtractorOptions,
+) => [Uint8ClampedArray, PaletteConfig | undefined];
+
+export type Colors = [number, number, number];
+
+export type ColorsArray = Array<Colors>;

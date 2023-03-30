@@ -1,8 +1,6 @@
-import { PaletteConfig, Rgb } from './types';
+import { Colors, ColorsArray, PaletteConfig, Rgb } from './types';
 
-type ColorArray = Array<[number, number, number]>;
-
-const getAverageColor = (colorArray: ColorArray) => {
+const getAverageFromColorArray = (colorArray: ColorsArray): Colors => {
   const len = colorArray.length;
   let count = 0;
   const rgb: Rgb = {
@@ -38,7 +36,7 @@ const createQualityBitMap = ({
   allowWhite: boolean;
 }) => {
   const step = 4;
-  const colorMap: ColorArray = [];
+  const colorMap: ColorsArray = [];
   for (let r, g, b, a, i = 0; i < bitMap.length; i += step * quality) {
     r = bitMap[i + 0];
     g = bitMap[i + 1];
@@ -78,6 +76,10 @@ class Palette {
 
   // TODO: implement getPalette
   getPalette() {
+    // return getAverageColor(colorArray);
+  }
+
+  createBitArray() {
     const { quality, background, allowWhite } = this.options;
     const colorArray = createQualityBitMap({
       bitMap: this.bitmap,
@@ -85,7 +87,12 @@ class Palette {
       quality: quality!,
       allowWhite: allowWhite!,
     });
-    return getAverageColor(colorArray);
+    return colorArray;
+  }
+
+  getAverage() {
+    const colorArray = this.createBitArray();
+    return getAverageFromColorArray(colorArray);
   }
 }
 

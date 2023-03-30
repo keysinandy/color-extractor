@@ -1,27 +1,39 @@
 import CanvasImage from './canvas-image';
 import Palette from './palette';
-import { ExtractorOptions } from './types';
+import { Colors, ExtractorOptions, GetPlateParamsFn } from './types';
 
-export const getColor = (image: HTMLImageElement, options: ExtractorOptions = {}) => {
+const getPlateParams: GetPlateParamsFn = (image, options = {}) => {
   const { clip, palette } = options;
   const canvas = new CanvasImage(image, clip);
   const imageData = canvas.getImageData();
-  const color = new Palette(imageData, palette).getPalette();
-  return color;
+  return [imageData, palette];
 };
 
-export const getColorByUrl = (source: string, options: ExtractorOptions = {}) => {
+const getColorByUrl = (
+  source: string,
+  options: ExtractorOptions = {},
+  callback: (image: HTMLImageElement, options?: ExtractorOptions) => Colors,
+) => {
   return new Promise((resolve, reject) => {
     try {
       const img = document.createElement('img');
       img.src = source;
       img.crossOrigin = 'anonymous';
       img.onload = () => {
-        resolve(getColor(img, options));
+        resolve(callback(img, options));
         img.remove();
       };
     } catch (error) {
       reject(error);
     }
   });
+};
+
+export const getAverageColor = (image: HTMLImageElement, options: ExtractorOptions = {}) => {
+  const [imageData, palette] = getPlateParams(image, options);
+  return new Palette(imageData, palette).getAverage();
+};
+
+export const getAverageByUrl = async (source: string, options: ExtractorOptions = {}) => {
+  return await getColorByUrl(source, options, getAverageColor);
 };

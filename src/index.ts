@@ -1,1 +1,1 @@
-export * from './color-extractor';
+export { getAverageByUrl, getAverageColor } from './color-extractor';
