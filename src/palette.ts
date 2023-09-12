@@ -1,6 +1,7 @@
-import { Colors, ColorsArray, PaletteConfig, Rgb } from './types';
+import { themeColor } from './box-cut';
+import { Color, ColorArray, PaletteConfig, Rgb } from './types';
 
-const getAverageFromColorArray = (colorArray: ColorsArray): Colors => {
+const getAverageFromColorArray = (colorArray: ColorArray): Color => {
   const len = colorArray.length;
   let count = 0;
   const rgb: Rgb = {
@@ -36,7 +37,7 @@ const createQualityBitMap = ({
   allowWhite: boolean;
 }) => {
   const step = 4;
-  const colorMap: ColorsArray = [];
+  const colorMap: ColorArray = [];
   for (let r, g, b, a, i = 0; i < bitMap.length; i += step * quality) {
     r = bitMap[i + 0];
     g = bitMap[i + 1];
@@ -74,9 +75,8 @@ class Palette {
     this.options = { ...defaultOptions, ...options };
   }
 
-  // TODO: implement getPalette
   getPalette() {
-    // return getAverageColor(colorArray);
+    return themeColor(this.createBitArray());
   }
 
   createBitArray() {

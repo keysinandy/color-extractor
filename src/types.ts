@@ -26,6 +26,6 @@ export type GetPlateParamsFn = (
   options: ExtractorOptions,
 ) => [Uint8ClampedArray, PaletteConfig | undefined];
 
-export type Colors = [number, number, number];
+export type Color = [number, number, number];
 
-export type ColorsArray = Array<Colors>;
+export type ColorArray = Array<Color>;

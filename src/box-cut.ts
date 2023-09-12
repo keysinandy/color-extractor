@@ -1,3 +1,5 @@
+import { Color } from './types';
+const MAX_NUM = 8;
 /**
  * 颜色盒子类
  *
@@ -14,29 +16,30 @@ type ColorItem = {
 class ColorBox {
   colorRange: ColorRange;
   total: number;
-  data: Uint8ClampedArray;
+  data: Color[];
   volume: number;
   rank: number;
-  constructor(colorRange: ColorRange, total: number, data: Uint8ClampedArray) {
+  constructor(colorRange: ColorRange, data: Color[]) {
     this.colorRange = colorRange;
-    this.total = total;
     this.data = data;
+    this.total = data.length;
     this.volume =
       (colorRange[0][1] - colorRange[0][0]) *
       (colorRange[1][1] - colorRange[1][0]) *
       (colorRange[2][1] - colorRange[2][0]);
+
     this.rank = this.total * this.volume;
   }
   getColor() {
-    const total = this.total;
     const data = this.data;
+    const total = this.total;
     let redCount = 0,
       greenCount = 0,
       blueCount = 0;
-    for (let i = 0; i < total; i++) {
-      redCount += data[i * 4];
-      greenCount += data[i * 4 + 1];
-      blueCount += data[i * 4 + 2];
+    for (const [red, green, blue] of data) {
+      redCount += red;
+      greenCount += green;
+      blueCount += blue;
     }
     return [~~(redCount / total), ~~(greenCount / total), ~~(blueCount / total)];
   }
@@ -63,7 +66,7 @@ function cutRange(colorRange: ColorRange, colorSide: number, cutValue: number): 
   return [arr1, arr2];
 }
 // 找到出现次数为中位数的颜色
-function getMedianColor(colorCountMap: Record<string, number>, total: number) {
+function getMedianColor(colorCountMap: Record<string, number>) {
   const arr: ColorItem[] = [];
   for (const key in colorCountMap) {
     arr.push({
@@ -73,7 +76,6 @@ function getMedianColor(colorCountMap: Record<string, number>, total: number) {
   }
   const sortArr = __quickSort(arr);
   let medianCount = 0;
-  const medianColor = 0;
   const medianIndex = Math.floor(sortArr.length / 2);
   for (let i = 0; i <= medianIndex; i++) {
     medianCount += sortArr[i].count;
@@ -82,6 +84,7 @@ function getMedianColor(colorCountMap: Record<string, number>, total: number) {
     color: ~~sortArr[medianIndex].color,
     count: medianCount,
   };
+
   function __quickSort(arr: ColorItem[]): ColorItem[] {
     if (arr.length <= 1) {
       return arr;
@@ -109,19 +112,19 @@ function cutBox(colorBox: ColorBox) {
     data = colorBox.data;
   // 统计出各个值的数量
   for (let i = 0; i < total; i++) {
-    const color = data[i * 4 + cutSide];
+    const color = data[i][cutSide];
     if (colorCountMap[color]) {
       colorCountMap[color] += 1;
     } else {
       colorCountMap[color] = 1;
     }
   }
-  const medianColor = getMedianColor(colorCountMap, total);
+  const medianColor = getMedianColor(colorCountMap);
   const cutValue = medianColor.color;
   const cutCount = medianColor.count;
   const newRange = cutRange(colorRange, cutSide, cutValue);
-  const box1 = new ColorBox(newRange[0], cutCount, data.slice(0, cutCount * 4)),
-    box2 = new ColorBox(newRange[1], total - cutCount, data.slice(cutCount * 4));
+  const box1 = new ColorBox(newRange[0], data.slice(0, cutCount)),
+    box2 = new ColorBox(newRange[1], data.slice(cutCount));
   return [box1, box2];
 }
 // 队列切割
@@ -131,36 +134,24 @@ function queueCut(queue: ColorBox[], num: number) {
       return a.rank - b.rank;
     });
     const colorBox = queue.pop()!;
-    const result = cutBox(colorBox);
-    queue = queue.concat(result);
+    const [prevBox, nextBox] = cutBox(colorBox);
+    queue = queue.concat(prevBox);
+    if (nextBox.total === 0) {
+      break;
+    } else {
+      queue = queue.concat(nextBox);
+    }
   }
-  return queue.slice(0, 8);
+  return queue.slice(0, num);
 }
-function themeColor(img: HTMLImageElement, callback: (color: number[][]) => void) {
-  const canvas = document.createElement('canvas'),
-    ctx = canvas.getContext('2d')!;
-  let width = 0,
-    height = 0,
-    imageData = null;
-  // length = 0,
-  // blockSize = 1,
-  // cubeArr = [];
-  width = canvas.width = img.width;
-  height = canvas.height = img.height;
-  ctx.drawImage(img, 0, 0, width, height);
-  imageData = ctx.getImageData(0, 0, width, height).data;
-  const total = imageData.length / 4;
+export function themeColor(imageData: Color[]) {
   let rMin = 255,
     rMax = 0,
     gMin = 255,
     gMax = 0,
     bMin = 255,
     bMax = 0;
-  // 获取范围
-  for (let i = 0; i < total; i++) {
-    const red = imageData[i * 4],
-      green = imageData[i * 4 + 1],
-      blue = imageData[i * 4 + 2];
+  for (const [red, green, blue] of imageData) {
     if (red < rMin) {
       rMin = red;
     }
@@ -185,12 +176,11 @@ function themeColor(img: HTMLImageElement, callback: (color: number[][]) => void
     [gMin, gMax],
     [bMin, bMax],
   ];
-  const colorBox = new ColorBox(colorRange, total, imageData);
-  const colorBoxArr = queueCut([colorBox], 8);
+  const colorBox = new ColorBox(colorRange, imageData);
+  const colorBoxArr = queueCut([colorBox], MAX_NUM);
   const colorArr = [];
   for (let j = 0; j < colorBoxArr.length; j++) {
     colorBoxArr[j].total && colorArr.push(colorBoxArr[j].getColor());
   }
-  callback(colorArr);
+  return colorArr as Color[];
 }
-export default themeColor;

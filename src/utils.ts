@@ -38,3 +38,44 @@ export const isDark = (rgb: Rgb) => {
   const [, , l] = rgbToHsl(rgb);
   return l < 0.5;
 };
+
+export const getImageByUrl = (source: string): PromiseLike<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const img = document.createElement('img');
+      img.crossOrigin = 'Anonymous';
+      img.src = source;
+      img.onload = () => {
+        resolve(img);
+      };
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+export const getImageData = (imageUrl: string) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', imageUrl, true);
+      xhr.responseType = 'arraybuffer';
+      xhr.onload = function () {
+        if (this.status === 200) {
+          const uInt8Array = new Uint8Array(this.response);
+          const len = uInt8Array.length;
+          const binaryString = new Array(len);
+          for (let i = 0; i < uInt8Array.length; i++) {
+            binaryString[i] = String.fromCharCode(uInt8Array[i]);
+          }
+          const data = binaryString.join('');
+          const base64 = window.btoa(data);
+          resolve('data:image/png;base64,' + base64);
+        }
+      };
+      xhr.send();
+    } catch (e) {
+      reject(e);
+    }
+  });
+};

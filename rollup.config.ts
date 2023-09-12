@@ -4,6 +4,8 @@ import { defineConfig } from 'rollup';
 import buble from '@rollup/plugin-buble';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
+import pkg from './package.json' assert { type: 'json' };
+import dts from 'rollup-plugin-dts';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,11 +19,11 @@ const config = defineConfig([
     input: resolveFile('src/index.ts'),
     output: [
       {
-        file: resolveFile('dist/index.js'),
+        file: resolveFile(pkg.main),
         format: 'cjs',
       },
       {
-        file: resolveFile('dist/index.mjs'),
+        file: resolveFile(pkg.module),
         format: 'es',
       },
     ],
@@ -31,15 +33,23 @@ const config = defineConfig([
     input: resolveFile('src/utils.ts'),
     output: [
       {
-        file: resolveFile('dist/utils.js'),
+        file: resolveFile(pkg.exports['./utils'].require),
         format: 'cjs',
       },
       {
-        file: resolveFile('dist/utils.mjs'),
+        file: resolveFile(pkg.exports['./utils'].import),
         format: 'es',
       },
     ],
     plugins: [typescript(), buble(), terser()],
+  },
+  {
+    input: resolveFile('src/index.ts'),
+    plugins: [dts()],
+    output: {
+      format: 'esm',
+      file: 'index.d.ts',
+    },
   },
 ]);
 

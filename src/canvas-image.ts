@@ -20,7 +20,8 @@ class CanvasImage {
 
   getImageData() {
     const { offsetX = 0, offsetY = 0 } = this.options;
-    return this.context.getImageData(offsetX, offsetY, this.width, this.height).data;
+    const imageData = this.context.getImageData(offsetX, offsetY, this.width - offsetX, this.height - offsetY);
+    return imageData.data;
   }
 }
 
