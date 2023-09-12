@@ -24,7 +24,8 @@
   },
   "scripts": {
     "build": "rimraf dist && rimraf es && node_modules/.bin/rollup -c rollup.config.ts --configPlugin typescript",
-    "build:watch": "rimraf dist && rimraf es && node_modules/.bin/rollup -c rollup.config.ts -w --configPlugin typescript"
+    "build:watch": "rimraf dist && rimraf es && node_modules/.bin/rollup -c rollup.config.ts -w --configPlugin typescript",
+    "build:publish": "npm run build && npm version patch && npm publish --registry https://registry.npmjs.org"
   },
   "keywords": [
     "extractor",
