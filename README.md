@@ -11,7 +11,12 @@ $ npm install @key/color-extractor
 # Usage
 
 ```javascript
-import { getAverageByUrl, getAverageColor } from 'color-extractor';
+import { getPaletteByUrl } from '@key/color-extractor';
 
-const color = getAverageByUrl;
+getPaletteByUrl('https://xxxxx.jpg').then((colors) => {
+  /** TODO */
+});
+getPaletteByUrl('https://xxxxx.png').then((colors) => {
+  /** TODO */
+});
 ```
